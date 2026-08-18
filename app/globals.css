@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 10, 10, 15; /* Near black text */
+  --background-rgb: 255, 255, 255; /* Pure white background */
+}
+
+/* Base typography for a professional look */
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+  font-feature-settings: "overline" 0, "salt" 0, "ss01" 0, "ss02" 0, "ss03" 0, "ss04" 0, "ss05" 0;
+}
+
+/* Optional smooth scrolling across the entire site */
+html {
+  scroll-behavior: smooth;
+}
