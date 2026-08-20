@@ -340,7 +340,7 @@ export class GreylistValidator {
 
       };
 
-    } catch (error) {
+    } catch {
 
       // If catch-all detection fails, assume uncertain
 
@@ -472,9 +472,16 @@ export class GreylistValidator {
 
         const result = await this.checkSmtp(mx, email, sender);
  
-        // Check for catch-all behavior
+        // Only run the catch-all probe when the target address was actually
+        // accepted (250). Running it after a hard bounce wastes a second
+        // connection to the receiving server for no reason, and repeated
+        // rapid connections from the same IP look like directory-harvesting
+        // to receiving mail servers — increasing the odds of getting
+        // rate-limited or blocked.
 
-        const catchAllDetection = await this.detectCatchAll(mx, domain, sender);
+        const catchAllDetection = result.code === '250'
+          ? await this.detectCatchAll(mx, domain, sender)
+          : { isCatchAll: false, certainty: 1.0 };
  
         // Hard bounce = definitely invalid
 
@@ -717,14 +724,64 @@ export class GreylistValidator {
       });
  
       // Handle SMTP responses
+      //
+      // `step` tracks which command we're waiting on a response FOR:
+      //   step 0 = waiting on the initial 220 greeting (about to send EHLO)
+      //   step 1 = waiting on the EHLO response (about to send MAIL FROM)
+      //   step 2 = waiting on the MAIL FROM response (about to send RCPT TO)
+      //   step 3 = waiting on the RCPT TO response — THIS is the one that
+      //            actually determines mailbox deliverability.
+      //
+      // Only the response received while step === 3 may resolve the promise
+      // as "Deliverable" or "Hard Bounce" for the target mailbox. Responses
+      // at earlier steps (greeting/EHLO/MAIL FROM) just advance the
+      // handshake — a 250 to MAIL FROM says nothing about whether the
+      // target mailbox exists.
 
       socket.on('data', (data) => {
 
         const response = data.toString();
 
         responseCode = response.substring(0, 3);
+
+        // Response to RCPT TO — this is the real verdict.
+        if (step === 3) {
+
+          socket.end();
+
+          if (this.config.greylistCodes.includes(responseCode)) {
+            return resolve({
+              isValid: false,
+              code: responseCode,
+              message: 'Greylisted',
+            });
+          }
+
+          if (responseCode.startsWith('5')) {
+            return resolve({
+              isValid: false,
+              code: responseCode,
+              message: 'Hard Bounce / Rejected',
+            });
+          }
+
+          if (responseCode.startsWith('2')) {
+            return resolve({
+              isValid: true,
+              code: responseCode,
+              message: 'Deliverable',
+            });
+          }
+
+          return resolve({
+            isValid: false,
+            code: responseCode,
+            message: `Ambiguous RCPT TO response: ${responseCode}`,
+          });
+
+        }
  
-        // Handle greylisting
+        // Handle greylisting on earlier steps (some servers greylist at EHLO/MAIL FROM already)
 
         if (this.config.greylistCodes.includes(responseCode)) {
 
@@ -742,7 +799,7 @@ export class GreylistValidator {
 
         }
  
-        // Handle hard bounces
+        // Handle hard bounces / rejections on earlier steps
 
         if (responseCode.startsWith('5')) {
 
@@ -760,31 +817,14 @@ export class GreylistValidator {
 
         }
  
-        // Handle success responses
+        // Handshake steps 0–2: send the next command and advance, but do
+        // NOT resolve yet — we haven't reached the RCPT TO response.
 
         if (responseCode.startsWith('2') || responseCode.startsWith('3')) {
 
           if (step < commands.length) {
 
             socket.write(commands[step]);
- 
-            // If RCPT TO succeeded, email accepted by server
-
-            if (step === 2) {
-
-              socket.end();
-
-              return resolve({
-
-                isValid: true,
-
-                code: responseCode,
-
-                message: 'Deliverable',
-
-              });
-
-            }
 
             step++;
 
@@ -825,4 +865,3 @@ export class GreylistValidator {
 */
 
 export const defaultValidator = new GreylistValidator();
- 

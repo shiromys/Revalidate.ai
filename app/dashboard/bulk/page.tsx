@@ -163,29 +163,57 @@ export default function BulkUploadPage() {
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (activeJobId && jobStatus !== 'COMPLETED') {
-      interval = setInterval(async () => {
-        try {
-          const res = await fetch(`/api/jobs/status?jobId=${activeJobId}&t=${Date.now()}`, {
-            cache: 'no-store'
-          });
-          const data = await res.json();
-          
-          if (data.completed !== undefined) {
-            setApiCompleted(data.completed);
-          }
-          
-          if (data.status?.toLowerCase() === 'completed' || data.progress === 100) {
-            setJobStatus('COMPLETED'); 
-          } else if (data.status) {
-            setJobStatus(data.status.toUpperCase()); 
-          }
-        } catch (error) {
-          console.error("Polling error", error);
+    const POLL_INTERVAL_MS = 4000;
+    // Safety cutoff: even with the Redis fix, a tab left open on a job that
+    // genuinely never resolves (e.g. the SMTP backend is down) shouldn't poll
+    // forever. This is what actually stops a forgotten open tab, independent
+    // of whatever the server-side bug of the day is.
+    const MAX_POLL_DURATION_MS = 20 * 60 * 1000; // 20 minutes
+    const startedAt = Date.now();
+
+    const poll = async () => {
+      // Never poll while the tab is backgrounded — this was the single
+      // biggest contributor to runaway Redis command usage: a bulk-upload
+      // tab left open (and forgotten) in the background kept firing this
+      // request every few seconds indefinitely.
+      if (document.hidden) return;
+
+      if (Date.now() - startedAt > MAX_POLL_DURATION_MS) {
+        console.warn(`Polling stopped for job ${activeJobId} after ${MAX_POLL_DURATION_MS / 60000} minutes without completion.`);
+        clearInterval(interval);
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/jobs/status?jobId=${activeJobId}&t=${Date.now()}`, {
+          cache: 'no-store'
+        });
+        const data = await res.json();
+
+        if (data.completed !== undefined) {
+          setApiCompleted(data.completed);
         }
-      }, 3000);
+
+        if (data.status?.toLowerCase() === 'completed' || data.progress === 100) {
+          setJobStatus('COMPLETED');
+        } else if (data.status) {
+          setJobStatus(data.status.toUpperCase());
+        }
+      } catch (error) {
+        console.error("Polling error", error);
+      }
+    };
+
+    if (activeJobId && jobStatus !== 'COMPLETED') {
+      interval = setInterval(poll, POLL_INTERVAL_MS);
+      // Catch up immediately when the tab becomes visible again instead of
+      // waiting up to POLL_INTERVAL_MS for the next tick.
+      document.addEventListener('visibilitychange', poll);
     }
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', poll);
+    };
   }, [activeJobId, jobStatus]);
 
 

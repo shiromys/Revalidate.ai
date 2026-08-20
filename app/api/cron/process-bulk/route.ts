@@ -232,7 +232,10 @@ export async function POST(req: Request) {
 
     console.log('📌 Starting bulk email validation cron job');
 
-    const jobQueue = await redis.lrange('validation_queue', 0, CONFIG.BATCH_SIZE - 1);
+    // FIX: this used to read 'validation_queue', a key nothing ever wrote to —
+    // /api/jobs/bulk enqueues onto 'tasks'. That mismatch meant this cron job
+    // always saw an empty queue and never actually processed a real upload.
+    const jobQueue = await redis.lrange('tasks', 0, CONFIG.BATCH_SIZE - 1);
 
     if (!jobQueue || jobQueue.length === 0) {
       console.log('✅ No pending jobs');
@@ -255,12 +258,18 @@ export async function POST(req: Request) {
         const mode = task.mode === 'basic' ? 'basic' : 'advanced';
         const result = await processEmail(task.jobId, task.email, mode);
 
-        const resultKey = `validation_result:${task.jobId}`;
-        await redis.set(
-          resultKey,
-          JSON.stringify(result),
-          { ex: 86400 }
-        );
+        // FIX: append to the per-job results LIST that /api/jobs/status,
+        // /api/jobs/download and /api/bulk-download actually read
+        // (previously this overwrote a single string key, 'validation_result:{jobId}',
+        // that nothing downstream ever looked at, and never accumulated more than
+        // one email's result per job).
+        const resultsKey = `results:${task.jobId}`;
+        await redis.rpush(resultsKey, JSON.stringify(result));
+        await redis.expire(resultsKey, 86400);
+
+        // FIX: decrement the pending counter set at enqueue time, so
+        // /api/jobs/status can detect completion in O(1) instead of never.
+        await redis.decr(`job:${task.jobId}:pending`);
 
         const { error: dbError } = await supabase.from('validation_results').insert([
           {
@@ -283,7 +292,7 @@ export async function POST(req: Request) {
           console.warn(`⚠️  DB error for ${result.email}:`, dbError.message);
         }
 
-        await redis.lpop('validation_queue');
+        await redis.lpop('tasks');
       } catch (error) {
         failureCount++;
         console.error('Error processing job:', error);

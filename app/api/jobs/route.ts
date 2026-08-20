@@ -74,31 +74,23 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Missing jobId' }, { status: 400 });
     }
 
-    // 1. Get Completed Count directly from Upstash
-    let completedCount = await redis.llen(`results:${jobId}`);
-    if (completedCount === 0) {
-      completedCount = await redis.llen(`job:${jobId}:results`);
-    }
+    // 1. Get Completed Count directly from Upstash — a single LLEN against the
+    // list /api/cron/process-bulk actually appends to (results:{jobId}).
+    const completedCount = await redis.llen(`results:${jobId}`);
 
-    // 2. Get Pending Count strictly from the dedicated Upstash job list
-    const pendingCount = await redis.llen(`job:${jobId}`);
-    
-    // 3. Double-check the main 'tasks' list to ensure the job isn't still waiting to start
-    const activeTasks = await redis.lrange('tasks', 0, -1);
-    let isWaitingInMainQueue = false;
-    
-    if (activeTasks && activeTasks.length > 0) {
-      for (const task of activeTasks) {
-        const taskString = typeof task === 'string' ? task : JSON.stringify(task);
-        if (taskString.includes(jobId)) {
-          isWaitingInMainQueue = true;
-          break;
-        }
-      }
-    }
+    // 2. Get Pending Count from the O(1) counter set at enqueue time
+    // (job:{jobId}:pending, decremented once per processed email).
+    // FIX: this used to be `LLEN job:{jobId}` — a list nothing ever wrote to,
+    // which always read back 0 and, combined with a full LRANGE('tasks', 0, -1)
+    // scan on every single poll "to be sure," meant a job could never be
+    // detected as complete. That's what kept the 3-second client poll loop
+    // running forever for any open bulk-validation tab. No more full-list scan
+    // needed: the counter alone is authoritative.
+    const pendingRaw = await redis.get(`job:${jobId}:pending`);
+    const pendingCount = pendingRaw !== null ? Number(pendingRaw) : null;
 
-    // 4. Calculate Progress completely independent of Supabase
-    const total = completedCount + pendingCount;
+    // 3. Calculate Progress completely independent of Supabase
+    const total = completedCount + Math.max(pendingCount ?? 0, 0);
     let progress = 0;
     let isComplete = false;
 
@@ -107,14 +99,17 @@ export async function GET(req: NextRequest) {
     }
 
     // ====================================================================
-    // THE ULTIMATE GATE: 
-    // The download button ONLY unlocks if Upstash confirms 0 pending items.
+    // THE ULTIMATE GATE:
+    // The download button ONLY unlocks once the pending counter hits 0.
+    // If the counter key has expired/vanished (pendingCount === null) we
+    // can't confirm completion from Redis alone, so we deliberately do NOT
+    // report "complete" — the client-side safety cutoff (see bulk/page.tsx)
+    // is what stops polling in that edge case, not this endpoint.
     // ====================================================================
-    if (pendingCount === 0 && !isWaitingInMainQueue && completedCount > 0) {
+    if (pendingCount !== null && pendingCount <= 0 && completedCount > 0) {
       progress = 100;
       isComplete = true;
     } else {
-      // If there is ANY pending task left in Upstash, force hold at 99%
       isComplete = false;
       if (progress >= 100) {
         progress = 99;

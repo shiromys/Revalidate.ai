@@ -9,10 +9,12 @@ const redis = new Redis({
 });
 
 // Explicit structure matching the data format saved by the email background worker
+// (see processEmail()'s return shape in app/api/cron/process-bulk/route.ts)
 interface ValidationResult {
   email?: string;
   address?: string; 
   status?: string;
+  reason?: string;
   isValid?: boolean;
   valid?: boolean;
   isCatchAll?: boolean;
@@ -28,9 +30,15 @@ export async function GET(req: NextRequest) {
     }
 
     // 1. GATING GUARD: Verify if the job is still actively running in Upstash Tasks list
+    // Each queued task is a JSON string like {"jobId":"...","email":"...","mode":"..."},
+    // so we need to check whether jobId appears WITHIN each entry, not an exact match.
     const activeTasks = await redis.lrange('tasks', 0, -1);
-    
-    if (activeTasks.includes(jobId)) {
+    const isStillPending = activeTasks.some(task => {
+      const taskString = typeof task === 'string' ? task : JSON.stringify(task);
+      return taskString.includes(jobId);
+    });
+
+    if (isStillPending) {
       return new NextResponse(
         `Validation is still processing in the background. Please wait until the task completes...`, 
         { status: 202, headers: { 'Retry-After': '5' } }
@@ -65,8 +73,8 @@ export async function GET(req: NextRequest) {
       if (!data) continue;
       
       const email = data.email || data.address || '';
-      const finalResult = data.status || 'Undeliverable';
-      const isRecordValid = data.isValid === true || data.valid === true || ['Deliverable', 'Inbox Exists', 'VALID'].includes(finalResult);
+      const isRecordValid = data.isValid === true || data.valid === true;
+      const finalResult = data.status || data.reason || (isRecordValid ? 'Deliverable' : 'Undeliverable');
 
       const syntax = isRecordValid ? 'TRUE' : 'FALSE';
       const mx = (finalResult !== 'Undeliverable' && !finalResult.includes('599')) ? 'TRUE' : 'FALSE';

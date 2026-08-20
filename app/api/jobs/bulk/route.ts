@@ -116,13 +116,18 @@ export async function POST(req: Request) {
     if (jobError) throw jobError;
 
     // 4. PREPARE & STREAM TASKS TO REDIS
-    const tasks = emailsToProcess.map((email: string) => JSON.stringify({ 
-      jobId, 
-      email, 
+    const tasks = emailsToProcess.map((email: string) => JSON.stringify({
+      jobId,
+      email,
       mode: mode === 'full' ? 'advanced' : 'basic'
     }));
-    
+
     await redis.lpush('tasks', ...tasks);
+
+    // 5. INITIALIZE THE PENDING COUNTER (single O(1) key /api/jobs/status reads
+    // instead of scanning the whole 'tasks' list on every poll). TTL matches the
+    // 24h result-retention window used elsewhere.
+    await redis.set(`job:${jobId}:pending`, totalEmailsToProcess, { ex: 90000 });
 
     return NextResponse.json({ 
       success: true, 
