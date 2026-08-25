@@ -90,7 +90,19 @@ export async function GET(req: NextRequest) {
     const pendingCount = pendingRaw !== null ? Number(pendingRaw) : null;
 
     // 3. Calculate Progress completely independent of Supabase
-    const total = completedCount + Math.max(pendingCount ?? 0, 0);
+    //
+    // FIX: `job:{jobId}:pending` is set ONCE at enqueue time (in
+    // /api/jobs/bulk) to the total email count for the job — nothing in
+    // this codebase, nor whatever external process actually validates the
+    // emails (its results land in `results:{jobId}` with a schema this repo
+    // doesn't produce — see the "syntax_valid"/"mx_valid" shape), ever
+    // decrements it. The old logic treated it as a countdown to zero and
+    // computed `total = completedCount + pendingCount`, which both double
+    // counts the total (e.g. 7 done + 7 "still pending" = 14) AND can never
+    // detect completion, since a counter nothing decrements never reaches
+    // zero. `pendingCount` IS the total — compare completedCount against it
+    // directly instead of expecting it to count down.
+    const total = pendingCount !== null ? pendingCount : completedCount;
     let progress = 0;
     let isComplete = false;
 
@@ -100,13 +112,16 @@ export async function GET(req: NextRequest) {
 
     // ====================================================================
     // THE ULTIMATE GATE:
-    // The download button ONLY unlocks once the pending counter hits 0.
+    // Complete once every email that was enqueued has a result, judged by
+    // comparing the results list length against the total stored at
+    // enqueue time — not by waiting for a counter that's never decremented.
     // If the counter key has expired/vanished (pendingCount === null) we
-    // can't confirm completion from Redis alone, so we deliberately do NOT
-    // report "complete" — the client-side safety cutoff (see bulk/page.tsx)
-    // is what stops polling in that edge case, not this endpoint.
+    // can't confirm the true total from Redis alone, so we deliberately do
+    // NOT report "complete" — the client-side safety cutoff (see
+    // bulk/page.tsx) is what stops polling in that edge case, not this
+    // endpoint.
     // ====================================================================
-    if (pendingCount !== null && pendingCount <= 0 && completedCount > 0) {
+    if (pendingCount !== null && completedCount >= pendingCount && completedCount > 0) {
       progress = 100;
       isComplete = true;
     } else {
