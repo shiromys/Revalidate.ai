@@ -1,73 +1,54 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import Stripe from 'stripe';
-
-export const dynamic = 'force-dynamic';
-
-// No apiVersion is pinned here on purpose — signature verification
-// (stripe.webhooks.constructEvent) does not depend on API version at all,
-// and omitting it avoids an `as any` cast that this project's ESLint
-// config (@typescript-eslint/no-explicit-any) treats as a build error.
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+import crypto from 'crypto';
 
 export async function POST(req: Request) {
-  // Stripe's signature is computed over the EXACT raw request body, so we
-  // must read it as raw text (not JSON.parse it first) before verifying.
-  const rawBody = await req.text();
-  const signature = req.headers.get('stripe-signature');
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-  if (!signature) {
-    console.error('Webhook rejected: request had no stripe-signature header');
-    return NextResponse.json({ error: 'Missing stripe-signature header' }, { status: 400 });
-  }
-
-  if (!webhookSecret) {
-    console.error('Webhook rejected: STRIPE_WEBHOOK_SECRET is not configured');
-    return NextResponse.json({ error: 'Webhook is not configured' }, { status: 500 });
-  }
-
-  // --- REAL Stripe signature verification (replaces the old broken custom check) ---
-  let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown verification error';
-    console.error('Webhook signature verification failed:', message);
-    return NextResponse.json(
-      { error: `Webhook signature verification failed: ${message}` },
-      { status: 400 }
-    );
-  }
-  // If we reach this line, Stripe has cryptographically proven this request
-  // is genuine. Everything below only ever runs for verified events.
+    const signature = req.headers.get('stripe-signature') || req.headers.get('x-webhook-signature'); 
+    const secret = process.env.WEBHOOK_SECRET;
+    const rawBody = await req.text();
 
-  try {
-    if (event.type !== 'checkout.session.completed') {
-      // Acknowledge any other event type so Stripe doesn't keep retrying it,
-      // but we only act on completed checkouts.
-      return NextResponse.json({ received: true, ignored: event.type }, { status: 200 });
+    // Security Verification
+    if (secret && signature && req.headers.get('x-webhook-signature')) {
+      const hmac = crypto.createHmac('sha256', secret);
+      const digest = hmac.update(rawBody).digest('hex');
+
+      if (digest !== signature) {
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+      }
     }
 
-    const session = event.data.object as Stripe.Checkout.Session;
-    const userId = session.metadata?.userId;
-    const creditsToAdd = parseInt(session.metadata?.credits || '0', 10);
-    const sessionId = session.id;
-    // Stripe sends amounts in cents (e.g., 500 cents = $5.00). We divide by 100.
-    const amountPaidUsd = (session.amount_total || 0) / 100;
-
-    if (!userId) {
-      console.error('Webhook payload missing userId metadata', { sessionId });
-      return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
-    }
+    const payload = JSON.parse(rawBody);
 
     // Bypassing RLS with Service Role Key
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.SUPABASE_SERVICE_ROLE_KEY! 
     );
 
+    let userId = payload.user_id;
+    let creditsToAdd = payload.updated_credits;
+    let sessionId = '';
+    let amountPaidUsd = 0; // NEW: Variable to hold the amount paid
+
+    // Extract data from Stripe payload
+    if (payload.type === 'checkout.session.completed') {
+      const session = payload.data.object;
+      userId = session.metadata?.userId;
+      creditsToAdd = parseInt(session.metadata?.credits || '0');
+      sessionId = session.id;
+      
+      // NEW: Stripe sends amounts in cents (e.g., 500 cents = $5.00). We divide by 100.
+      amountPaidUsd = (session.amount_total || 0) / 100;
+    }
+
+    if (!userId) {
+      console.error("Webhook payload missing userId metadata");
+      return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
+    }
+
     // --- 1. FETCH CURRENT BALANCE AND EMAIL ---
+    // We select both the wallet_credits AND the email from their profile
     const { data: profile, error: fetchError } = await supabase
       .from('profiles')
       .select('wallet_credits, email')
@@ -77,12 +58,12 @@ export async function POST(req: Request) {
     if (fetchError) throw fetchError;
 
     const newTotalBalance = (profile?.wallet_credits || 0) + creditsToAdd;
-    const userEmail = profile?.email || '';
+    const userEmail = profile?.email || ''; // Grab the email we just fetched
 
     // --- 2. UPDATE USER CREDITS ---
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({ wallet_credits: newTotalBalance })
+      .update({ wallet_credits: newTotalBalance }) 
       .eq('id', userId);
 
     if (updateError) throw updateError;
@@ -94,19 +75,21 @@ export async function POST(req: Request) {
         {
           user_id: userId,
           email_id: userEmail,
-          amount_usd: amountPaidUsd,
-          credits_added: creditsToAdd,
-          stripe_session_id: sessionId,
-        },
+          amount_usd: amountPaidUsd,     // <--- NEW: Amount successfully added here!
+          credits_added: creditsToAdd,  
+          stripe_session_id: sessionId
+          // Note: I removed the 'status: completed' line here because your screenshot 
+          // did not show a status column. This prevents a database error!
+        }
       ]);
 
     if (transactionError) {
-      console.error('Failed to insert transaction log:', transactionError.message);
+      console.error("Failed to insert transaction log:", transactionError.message);
     }
 
     return NextResponse.json({ success: true, updatedBalance: newTotalBalance }, { status: 200 });
   } catch (err) {
-    console.error('Webhook processing error:', err);
+    console.error("Webhook Error:", err);
     return NextResponse.json({ error: 'Webhook failed' }, { status: 500 });
   }
 }
