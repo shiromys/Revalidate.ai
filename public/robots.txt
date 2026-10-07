@@ -1,6 +1,6 @@
 # Revalidate.ai Robots.txt
 # This file tells search engines which pages to crawl and which to avoid
-
+ 
 # Allow all search engines to crawl the site (default)
 User-agent: *
 Allow: /
@@ -13,7 +13,7 @@ Disallow: /static
 Disallow: /*.json$
 Disallow: /*?*sort=
 Disallow: /*?*filter=
-
+ 
 # Specific rules for Google
 User-agent: Googlebot
 Allow: /
@@ -24,7 +24,7 @@ Disallow: /api
 Disallow: /_next
 Disallow: /static
 Crawl-delay: 0
-
+ 
 # Specific rules for Bing
 User-agent: Bingbot
 Allow: /
@@ -35,19 +35,19 @@ Disallow: /api
 Disallow: /_next
 Disallow: /static
 Crawl-delay: 1
-
+ 
 # Block bad bots
 User-agent: MJ12bot
 Disallow: /
-
+ 
 User-agent: AhrefsBot
 Disallow: /
-
+ 
 User-agent: SemrushBot
 Disallow: /
-
+ 
 User-agent: DotBot
 Disallow: /
-
+ 
 # Sitemap location
-Sitemap: https://revalidate.ai/sitemap.xml
+Sitemap: https://www.revalidate.ai/sitemap.xml
