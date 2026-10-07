@@ -68,7 +68,7 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   
   // Define fallback app URL for canonical redirects
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://revalidate.ai';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://www.revalidate.ai';
 
   // 1. PROTECTION LOGIC: Redirect unauthenticated users away from dashboard/admin
   if ((isDashboardRoute || isAdminRoute) && !user) {
