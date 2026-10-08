@@ -110,6 +110,20 @@ export default function TermsOfServicePage() {
              <span className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-zinc-700 cursor-pointer transition-colors text-xs text-white">X</span>
           </div>
         </div>
+
+        <div className="max-w-7xl mx-auto mt-6 flex justify-center md:justify-start">
+          <a
+            href="https://peerpush.com/p/revalidateai"
+            target="_blank"
+            rel="noopener"
+          >
+            <img
+              src="https://peerpush.com/p/revalidateai/badge.png"
+              alt="Revalidate.ai on PeerPush"
+              style={{ width: '230px' }}
+            />
+          </a>
+        </div>
       </footer>
 
     </div>
