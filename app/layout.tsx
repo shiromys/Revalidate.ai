@@ -23,11 +23,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Revalidate.ai - Real-Time Email Verification",
     description: "Validate and clean your email lists instantly. Protect your sender reputation.",
-    url: "https://revalidate.ai",
+    url: "https://www.revalidate.ai",
     siteName: "Revalidate.ai",
     images: [
       {
-        url: "https://revalidate.ai/og-image.png",
+        url: "https://www.revalidate.ai/og-image.png",
         width: 1200,
         height: 630,
         alt: "Revalidate.ai - Email Verification Platform",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   alternates: {
-    canonical: "https://revalidate.ai",
+    canonical: "https://www.revalidate.ai",
   },
 };
 
