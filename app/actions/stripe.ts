@@ -32,8 +32,10 @@ export async function createCheckoutSession(priceId: string, credits: number) {
       ],
       mode: 'payment',
       
-      // NEW: Instead of just 'success=true', we ask Stripe to attach the specific Session ID
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+      // We ask Stripe to attach the specific Session ID, and also pass success=true plus
+      // the exact credit amount straight through — we already know it here, so the
+      // thank-you overlay doesn't need to guess or wait on the webhook to show the right number.
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}&success=true&credits=${credits}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?canceled=true`,
     })
 

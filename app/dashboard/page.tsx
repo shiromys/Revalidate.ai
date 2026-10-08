@@ -2,7 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import CheckoutButton from '@/components/CheckoutButton'
-import PendingCheckoutHandler from '@/components/PendingCheckoutHandler' 
+import PendingCheckoutHandler from '@/components/PendingCheckoutHandler'
+import CheckoutSuccessOverlay from '@/components/CheckoutSuccessOverlay'
 import { 
   Wallet, 
   BarChart3,
@@ -48,13 +49,16 @@ const isFileExpired = (createdAt: string) => {
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ showUsage?: string; showAddFunds?: string; success?: string; canceled?: string; session_id?: string }>
+  searchParams: Promise<{ showUsage?: string; showAddFunds?: string; success?: string; canceled?: string; session_id?: string; credits?: string }>
 }) {
   const params = await searchParams;
   const showUsage = params?.showUsage === 'true';
   const showAddFunds = params?.showAddFunds === 'true'; 
   const isSuccess = params?.success === 'true';
   const isCanceled = params?.canceled === 'true';
+  const parsedCredits = params?.credits ? parseInt(params.credits, 10) : null;
+  const purchasedCredits = parsedCredits !== null && Number.isFinite(parsedCredits) ? parsedCredits : null;
+  const checkoutSessionId = params?.session_id || null;
 
   const supabase = createClient()
   
@@ -109,16 +113,7 @@ export default async function DashboardPage({
     <div className="space-y-10 relative font-sans selection:bg-red-100 selection:text-red-900 max-w-6xl mx-auto">
       
       <PendingCheckoutHandler />
-
-      {isSuccess && (
-        <div className="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-800 px-6 py-5 rounded-2xl shadow-sm flex items-center gap-3 animate-in slide-in-from-top-4 fade-in duration-500">
-          <CheckCircle2 size={26} className="text-emerald-600 shrink-0" />
-          <div>
-            <p className="font-bold text-base tracking-tight">Payment Successful!</p>
-            <p className="text-sm font-medium opacity-90 mt-0.5">Your available verification credits have been updated.</p>
-          </div>
-        </div>
-      )}
+      <CheckoutSuccessOverlay success={isSuccess} sessionId={checkoutSessionId} fallbackCredits={purchasedCredits} />
 
       {isCanceled && (
         <div className="mb-4 bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-2xl shadow-sm flex items-center gap-3 animate-in slide-in-from-top-4 fade-in duration-500">
