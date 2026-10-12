@@ -18,3 +18,21 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+/* Auto-scrolling "featured on" badge strip in the footer */
+@keyframes badge-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.badge-marquee-track {
+  animation: badge-marquee 22s linear infinite;
+}
+
+.badge-marquee-track:hover {
+  animation-play-state: paused;
+}

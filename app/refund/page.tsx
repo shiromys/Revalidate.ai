@@ -21,7 +21,7 @@ export default function TermsPage() {
               <Coins size={26} />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white">Terms of Service</h1>
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white">Refund Policy</h1>
               <p className="text-sm font-medium text-zinc-500 mt-1">Effective Date: March 18, 2026</p>
             </div>
           </header>
@@ -113,18 +113,116 @@ export default function TermsPage() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto mt-6 flex justify-center md:justify-start">
-          <a
-            href="https://peerpush.com/p/revalidateai"
-            target="_blank"
-            rel="noopener"
-          >
-            <img
-              src="https://peerpush.com/p/revalidateai/badge.png"
-              alt="Revalidate.ai on PeerPush"
-              style={{ width: '230px' }}
-            />
-          </a>
+        <div className="mt-6 overflow-hidden w-full">
+          <div className="badge-marquee-track flex items-center gap-10 w-max">
+            {/* Set 1 */}
+            <a
+              href="https://peerpush.com/p/revalidateai"
+              target="_blank"
+              rel="noopener"
+            >
+              <img
+                src="https://peerpush.com/p/revalidateai/badge.png"
+                alt="Revalidate.ai on PeerPush"
+                style={{ width: '230px' }}
+              />
+            </a>
+
+            <a
+              href="https://alternativeto.net/software/revalidate-ai/about/?utm_source=badge&utm_medium=referral"
+              target="_blank"
+              rel="noopener"
+            >
+              <img
+                src="https://alternativeto.net/static/badges/badge-compact-color.svg"
+                alt="Revalidate.ai | AlternativeTo"
+                width={244}
+                height={79}
+                style={{ width: '244px', height: '79px' }}
+              />
+            </a>
+
+            <a
+              href="https://findly.tools/revalidate-ai?utm_source=revalidate-ai"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="https://findly.tools/badges/findly-tools-badge-light.svg"
+                alt="Featured on Findly.tools"
+                width={175}
+                height={55}
+              />
+            </a>
+
+            <a
+              href="https://smollaunch.com"
+              target="_blank"
+              rel="noopener"
+            >
+              <img
+                src="https://smollaunch.com/badges/featured.svg"
+                alt="Revalidate.ai — Featured on Smol Launch"
+                loading="lazy"
+                width={250}
+                height={60}
+              />
+            </a>
+
+            {/* Set 2 (duplicate, so the loop never shows a gap) */}
+            <a
+              href="https://peerpush.com/p/revalidateai"
+              target="_blank"
+              rel="noopener"
+            >
+              <img
+                src="https://peerpush.com/p/revalidateai/badge.png"
+                alt="Revalidate.ai on PeerPush"
+                style={{ width: '230px' }}
+              />
+            </a>
+
+            <a
+              href="https://alternativeto.net/software/revalidate-ai/about/?utm_source=badge&utm_medium=referral"
+              target="_blank"
+              rel="noopener"
+            >
+              <img
+                src="https://alternativeto.net/static/badges/badge-compact-color.svg"
+                alt="Revalidate.ai | AlternativeTo"
+                width={244}
+                height={79}
+                style={{ width: '244px', height: '79px' }}
+              />
+            </a>
+
+            <a
+              href="https://findly.tools/revalidate-ai?utm_source=revalidate-ai"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="https://findly.tools/badges/findly-tools-badge-light.svg"
+                alt="Featured on Findly.tools"
+                width={175}
+                height={55}
+              />
+            </a>
+
+            <a
+              href="https://smollaunch.com"
+              target="_blank"
+              rel="noopener"
+            >
+              <img
+                src="https://smollaunch.com/badges/featured.svg"
+                alt="Revalidate.ai — Featured on Smol Launch"
+                loading="lazy"
+                width={250}
+                height={60}
+              />
+            </a>
+          </div>
         </div>
       </footer>
 
