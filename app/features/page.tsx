@@ -204,6 +204,7 @@ export default function FeaturesPage() {
                 alt="Featured on Findly.tools"
                 width={175}
                 height={55}
+                style={{ width: '175px', height: '55px' }}
               />
             </a>
 
@@ -218,6 +219,7 @@ export default function FeaturesPage() {
                 loading="lazy"
                 width={175}
                 height={55}
+                style={{ width: '175px', height: '55px' }}
               />
             </a>
 
@@ -274,6 +276,7 @@ export default function FeaturesPage() {
                 alt="Featured on Findly.tools"
                 width={175}
                 height={55}
+                style={{ width: '175px', height: '55px' }}
               />
             </a>
 
@@ -288,6 +291,7 @@ export default function FeaturesPage() {
                 loading="lazy"
                 width={175}
                 height={55}
+                style={{ width: '175px', height: '55px' }}
               />
             </a>
 

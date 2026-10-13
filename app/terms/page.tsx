@@ -152,6 +152,7 @@ export default function TermsOfServicePage() {
                 alt="Featured on Findly.tools"
                 width={175}
                 height={55}
+                style={{ width: '175px', height: '55px' }}
               />
             </a>
 
@@ -166,6 +167,7 @@ export default function TermsOfServicePage() {
                 loading="lazy"
                 width={175}
                 height={55}
+                style={{ width: '175px', height: '55px' }}
               />
             </a>
 
@@ -222,6 +224,7 @@ export default function TermsOfServicePage() {
                 alt="Featured on Findly.tools"
                 width={175}
                 height={55}
+                style={{ width: '175px', height: '55px' }}
               />
             </a>
 
@@ -236,6 +239,7 @@ export default function TermsOfServicePage() {
                 loading="lazy"
                 width={175}
                 height={55}
+                style={{ width: '175px', height: '55px' }}
               />
             </a>
 
