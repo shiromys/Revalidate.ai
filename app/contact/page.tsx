@@ -239,7 +239,9 @@ export default function ContactPage() {
               <img
                 src="https://peerpush.com/p/revalidateai/badge.png"
                 alt="Revalidate.ai on PeerPush"
-                style={{ width: '230px' }}
+                width={175}
+                height={55}
+                style={{ width: '175px', height: '55px' }}
               />
             </a>
 
@@ -251,9 +253,9 @@ export default function ContactPage() {
               <img
                 src="https://alternativeto.net/static/badges/badge-compact-color.svg"
                 alt="Revalidate.ai | AlternativeTo"
-                width={244}
-                height={79}
-                style={{ width: '244px', height: '79px' }}
+                width={175}
+                height={55}
+                style={{ width: '175px', height: '55px' }}
               />
             </a>
 
@@ -279,8 +281,22 @@ export default function ContactPage() {
                 src="https://smollaunch.com/badges/featured.svg"
                 alt="Revalidate.ai — Featured on Smol Launch"
                 loading="lazy"
-                width={250}
-                height={60}
+                width={175}
+                height={55}
+              />
+            </a>
+
+            <a
+              href="https://www.producthunt.com/products/revalidate-ai/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-revalidate-ai"
+              target="_blank"
+              rel="noopener"
+            >
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1339038&theme=light"
+                alt="Revalidate.ai - Real-time email verification that cuts bounces | Product Hunt"
+                width={175}
+                height={55}
+                style={{ width: '175px', height: '55px' }}
               />
             </a>
 
@@ -293,7 +309,9 @@ export default function ContactPage() {
               <img
                 src="https://peerpush.com/p/revalidateai/badge.png"
                 alt="Revalidate.ai on PeerPush"
-                style={{ width: '230px' }}
+                width={175}
+                height={55}
+                style={{ width: '175px', height: '55px' }}
               />
             </a>
 
@@ -305,9 +323,9 @@ export default function ContactPage() {
               <img
                 src="https://alternativeto.net/static/badges/badge-compact-color.svg"
                 alt="Revalidate.ai | AlternativeTo"
-                width={244}
-                height={79}
-                style={{ width: '244px', height: '79px' }}
+                width={175}
+                height={55}
+                style={{ width: '175px', height: '55px' }}
               />
             </a>
 
@@ -333,8 +351,22 @@ export default function ContactPage() {
                 src="https://smollaunch.com/badges/featured.svg"
                 alt="Revalidate.ai — Featured on Smol Launch"
                 loading="lazy"
-                width={250}
-                height={60}
+                width={175}
+                height={55}
+              />
+            </a>
+
+            <a
+              href="https://www.producthunt.com/products/revalidate-ai/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-revalidate-ai"
+              target="_blank"
+              rel="noopener"
+            >
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1339038&theme=light"
+                alt="Revalidate.ai - Real-time email verification that cuts bounces | Product Hunt"
+                width={175}
+                height={55}
+                style={{ width: '175px', height: '55px' }}
               />
             </a>
           </div>
