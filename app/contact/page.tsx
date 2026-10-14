@@ -236,13 +236,14 @@ export default function ContactPage() {
               target="_blank"
               rel="noopener"
             >
-              <img
-                src="https://peerpush.com/p/revalidateai/badge.png"
-                alt="Revalidate.ai on PeerPush"
-                width={175}
-                height={55}
-                style={{ width: '175px', height: '55px' }}
-              />
+              <span className="badge-box">
+                <img
+                  src="https://peerpush.com/p/revalidateai/badge.png"
+                  alt="Revalidate.ai on PeerPush"
+                  width={175}
+                  height={55}
+                />
+              </span>
             </a>
 
             <a
@@ -250,13 +251,14 @@ export default function ContactPage() {
               target="_blank"
               rel="noopener"
             >
-              <img
-                src="https://alternativeto.net/static/badges/badge-compact-color.svg"
-                alt="Revalidate.ai | AlternativeTo"
-                width={175}
-                height={55}
-                style={{ width: '175px', height: '55px' }}
-              />
+              <span className="badge-box">
+                <img
+                  src="https://alternativeto.net/static/badges/badge-compact-color.svg"
+                  alt="Revalidate.ai | AlternativeTo"
+                  width={175}
+                  height={55}
+                />
+              </span>
             </a>
 
             <a
@@ -264,13 +266,14 @@ export default function ContactPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <img
-                src="https://findly.tools/badges/findly-tools-badge-light.svg"
-                alt="Featured on Findly.tools"
-                width={175}
-                height={55}
-                style={{ width: '175px', height: '55px' }}
-              />
+              <span className="badge-box">
+                <img
+                  src="https://findly.tools/badges/findly-tools-badge-light.svg"
+                  alt="Featured on Findly.tools"
+                  width={175}
+                  height={55}
+                />
+              </span>
             </a>
 
             <a
@@ -278,14 +281,15 @@ export default function ContactPage() {
               target="_blank"
               rel="noopener"
             >
-              <img
-                src="https://smollaunch.com/badges/featured.svg"
-                alt="Revalidate.ai — Featured on Smol Launch"
-                loading="lazy"
-                width={175}
-                height={55}
-                style={{ width: '175px', height: '55px' }}
-              />
+              <span className="badge-box">
+                <img
+                  src="https://smollaunch.com/badges/featured.svg"
+                  alt="Revalidate.ai — Featured on Smol Launch"
+                  loading="lazy"
+                  width={175}
+                  height={55}
+                />
+              </span>
             </a>
 
             <a
@@ -293,13 +297,14 @@ export default function ContactPage() {
               target="_blank"
               rel="noopener"
             >
-              <img
-                src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1339038&theme=light"
-                alt="Revalidate.ai - Real-time email verification that cuts bounces | Product Hunt"
-                width={175}
-                height={55}
-                style={{ width: '175px', height: '55px' }}
-              />
+              <span className="badge-box">
+                <img
+                  src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1339038&theme=light"
+                  alt="Revalidate.ai - Real-time email verification that cuts bounces | Product Hunt"
+                  width={175}
+                  height={55}
+                />
+              </span>
             </a>
 
             {/* Set 2 (duplicate, so the loop never shows a gap) */}
@@ -308,13 +313,14 @@ export default function ContactPage() {
               target="_blank"
               rel="noopener"
             >
-              <img
-                src="https://peerpush.com/p/revalidateai/badge.png"
-                alt="Revalidate.ai on PeerPush"
-                width={175}
-                height={55}
-                style={{ width: '175px', height: '55px' }}
-              />
+              <span className="badge-box">
+                <img
+                  src="https://peerpush.com/p/revalidateai/badge.png"
+                  alt="Revalidate.ai on PeerPush"
+                  width={175}
+                  height={55}
+                />
+              </span>
             </a>
 
             <a
@@ -322,13 +328,14 @@ export default function ContactPage() {
               target="_blank"
               rel="noopener"
             >
-              <img
-                src="https://alternativeto.net/static/badges/badge-compact-color.svg"
-                alt="Revalidate.ai | AlternativeTo"
-                width={175}
-                height={55}
-                style={{ width: '175px', height: '55px' }}
-              />
+              <span className="badge-box">
+                <img
+                  src="https://alternativeto.net/static/badges/badge-compact-color.svg"
+                  alt="Revalidate.ai | AlternativeTo"
+                  width={175}
+                  height={55}
+                />
+              </span>
             </a>
 
             <a
@@ -336,13 +343,14 @@ export default function ContactPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <img
-                src="https://findly.tools/badges/findly-tools-badge-light.svg"
-                alt="Featured on Findly.tools"
-                width={175}
-                height={55}
-                style={{ width: '175px', height: '55px' }}
-              />
+              <span className="badge-box">
+                <img
+                  src="https://findly.tools/badges/findly-tools-badge-light.svg"
+                  alt="Featured on Findly.tools"
+                  width={175}
+                  height={55}
+                />
+              </span>
             </a>
 
             <a
@@ -350,14 +358,15 @@ export default function ContactPage() {
               target="_blank"
               rel="noopener"
             >
-              <img
-                src="https://smollaunch.com/badges/featured.svg"
-                alt="Revalidate.ai — Featured on Smol Launch"
-                loading="lazy"
-                width={175}
-                height={55}
-                style={{ width: '175px', height: '55px' }}
-              />
+              <span className="badge-box">
+                <img
+                  src="https://smollaunch.com/badges/featured.svg"
+                  alt="Revalidate.ai — Featured on Smol Launch"
+                  loading="lazy"
+                  width={175}
+                  height={55}
+                />
+              </span>
             </a>
 
             <a
@@ -365,13 +374,14 @@ export default function ContactPage() {
               target="_blank"
               rel="noopener"
             >
-              <img
-                src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1339038&theme=light"
-                alt="Revalidate.ai - Real-time email verification that cuts bounces | Product Hunt"
-                width={175}
-                height={55}
-                style={{ width: '175px', height: '55px' }}
-              />
+              <span className="badge-box">
+                <img
+                  src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1339038&theme=light"
+                  alt="Revalidate.ai - Real-time email verification that cuts bounces | Product Hunt"
+                  width={175}
+                  height={55}
+                />
+              </span>
             </a>
           </div>
         </div>

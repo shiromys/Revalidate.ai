@@ -36,3 +36,25 @@ html {
 .badge-marquee-track:hover {
   animation-play-state: paused;
 }
+
+/* Fixed-size box for every footer badge so all five render at an identical
+   visual footprint, no matter what native dimensions each badge image
+   ships with. The !important rules guarantee this wins over Tailwind's
+   base `img { height: auto }` reset regardless of load order. */
+.badge-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 175px;
+  height: 55px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.badge-box img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  object-fit: fill;
+  display: block;
+}
