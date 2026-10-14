@@ -37,24 +37,35 @@ html {
   animation-play-state: paused;
 }
 
-/* Fixed-size box for every footer badge so all five render at an identical
-   visual footprint, no matter what native dimensions each badge image
-   ships with. The !important rules guarantee this wins over Tailwind's
-   base `img { height: auto }` reset regardless of load order. */
+/* Fixed-size card for every footer badge so all five render at an identical,
+   visibly bounded footprint no matter what native dimensions or aspect
+   ratio each badge image ships with. The box itself (not the image) is the
+   source of truth for size: object-fit: contain scales each logo DOWN to
+   fit inside without stretching or cropping, so nothing can ever exceed
+   this box, and a shared background/border makes the identical footprint
+   obvious at a glance regardless of each logo's own colors/whitespace.
+   The !important rules guarantee this wins over Tailwind's base
+   `img { height: auto }` reset regardless of load order. */
 .badge-box {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 175px;
-  height: 55px;
+  width: 160px;
+  height: 48px;
   flex-shrink: 0;
   overflow: hidden;
+  box-sizing: border-box;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .badge-box img {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: none !important;
-  object-fit: fill;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain;
   display: block;
 }
