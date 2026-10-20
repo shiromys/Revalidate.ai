@@ -228,16 +228,16 @@ export default function FeaturesPage() {
             </a>
 
             <a
-              href="https://www.producthunt.com/products/revalidate-ai/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-revalidate-ai"
+              href="https://www.producthunt.com/products/revalidate-ai?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-revalidate-ai"
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
             >
               <span className="badge-box">
                 <img
-                  src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1339038&theme=light"
+                  src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1274035&theme=light&t=1792426916870"
                   alt="Revalidate.ai - Real-time email verification that cuts bounces | Product Hunt"
-                  width={175}
-                  height={55}
+                  width={250}
+                  height={54}
                 />
               </span>
             </a>
@@ -305,16 +305,16 @@ export default function FeaturesPage() {
             </a>
 
             <a
-              href="https://www.producthunt.com/products/revalidate-ai/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-revalidate-ai"
+              href="https://www.producthunt.com/products/revalidate-ai?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-revalidate-ai"
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
             >
               <span className="badge-box">
                 <img
-                  src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1339038&theme=light"
+                  src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1274035&theme=light&t=1792426916870"
                   alt="Revalidate.ai - Real-time email verification that cuts bounces | Product Hunt"
-                  width={175}
-                  height={55}
+                  width={250}
+                  height={54}
                 />
               </span>
             </a>
