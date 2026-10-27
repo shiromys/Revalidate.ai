@@ -17,12 +17,37 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Revalidate.ai - AI-Powered Email Verification Platform",
-  description: "Validate and clean your email lists in real-time. Remove invalid, disposable, and risky addresses. Improve email deliverability and protect your sender reputation.",
-  keywords: ['email validation', 'email verifier', 'SMTP validation', 'email cleaning', 'email verification'],
+  metadataBase: new URL("https://www.revalidate.ai"),
+  title: "Email Verification & Validation Tool | Revalidate.ai",
+  description: "Real-time email verification and bulk list cleaning. Detect invalid, disposable and catch-all emails, cut bounces and protect sender reputation. Start free.",
+  applicationName: "Revalidate.ai",
+  keywords: [
+    // Short-tail
+    'email verification',
+    'email validation',
+    'email verifier',
+    'email validator',
+    'email checker',
+    'bulk email verifier',
+    'email list cleaning',
+    // Long-tail
+    'real-time email verification',
+    'bulk email validation CSV',
+    'clean email list online',
+    'email list verification service',
+    'SMTP email verification',
+    'disposable email detector',
+    'catch-all email detection',
+    'role-based email detection',
+    'reduce email bounce rate',
+    'improve email deliverability',
+    'protect sender reputation',
+    'pay-as-you-go email verification',
+    'free email verifier',
+  ],
   openGraph: {
-    title: "Revalidate.ai - Real-Time Email Verification",
-    description: "Validate and clean your email lists instantly. Protect your sender reputation.",
+    title: "Revalidate.ai - Real-Time Email Verification & List Cleaning",
+    description: "Verify single emails or clean bulk CSV lists in real time. Catch invalid, disposable and catch-all addresses and protect your sender reputation.",
     url: "https://www.revalidate.ai",
     siteName: "Revalidate.ai",
     images: [
@@ -37,17 +62,53 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Revalidate.ai - AI-Powered Email Verification",
-    description: "Validate and clean your email lists in real-time.",
+    title: "Revalidate.ai - Email Verification & List Cleaning",
+    description: "Verify emails in real time, clean bulk lists and reduce bounces.",
     creator: "@revalidateai",
   },
   robots: {
     index: true,
     follow: true,
   },
-  alternates: {
-    canonical: "https://www.revalidate.ai",
-  },
+  // NOTE: the canonical URL is set on each public page individually.
+  // A canonical here would be inherited by every page and point them all at the homepage.
+};
+
+// Structured data (JSON-LD) so search engines understand what the site is.
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.revalidate.ai/#organization",
+      name: "Revalidate.ai",
+      url: "https://www.revalidate.ai",
+      logo: "https://www.revalidate.ai/logo.png",
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.revalidate.ai/#website",
+      url: "https://www.revalidate.ai",
+      name: "Revalidate.ai",
+      publisher: { "@id": "https://www.revalidate.ai/#organization" },
+    },
+    {
+      "@type": "SoftwareApplication",
+      name: "Revalidate.ai",
+      url: "https://www.revalidate.ai",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      description:
+        "Real-time email verification and bulk email list cleaning. Checks syntax, MX records and live SMTP, and detects disposable, role-based and catch-all addresses.",
+      offers: {
+        "@type": "AggregateOffer",
+        priceCurrency: "USD",
+        lowPrice: "0",
+        highPrice: "200",
+        offerCount: "7",
+      },
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -58,6 +119,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         {/* Google Analytics with your ID: G-PNKXG2MP71 */}
         {/* strategy changed to beforeInteractive so the tag is present in the raw server-rendered HTML — required for Google Search Console's "Google Analytics" domain verification method to detect it */}
         <Script
