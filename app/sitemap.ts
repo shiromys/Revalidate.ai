@@ -134,44 +134,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     },
 
-    // Authentication Pages (Low priority - for completeness)
-
-    {
-
-      url: `${baseUrl}/auth/signup`,
-
-      lastModified: new Date('2026-07-24'),
-
-      changeFrequency: 'never' as const,
-
-      priority: 0.3,
-
-    },
-
-    {
-
-      url: `${baseUrl}/auth/login`,
-
-      lastModified: new Date('2026-07-24'),
-
-      changeFrequency: 'never' as const,
-
-      priority: 0.3,
-
-    },
-
-    {
-
-      url: `${baseUrl}/auth/forgot-password`,
-
-      lastModified: new Date('2026-07-24'),
-
-      changeFrequency: 'never' as const,
-
-      priority: 0.2,
-
-    },
-
     // Future Blog Routes (uncomment when blog is added)
 
     // {
@@ -274,5 +236,4 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
 * 
 
-*/
- 
+*/s

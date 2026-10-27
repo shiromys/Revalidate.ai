@@ -2,6 +2,12 @@ import Link from 'next/link'
 import { Coins, AlertCircle, BadgePercent, HelpCircle } from 'lucide-react'
 import BackButton from '../../components/BackButton'
 
+export const metadata = {
+  title: 'Refund Policy | Revalidate.ai',
+  description: 'Refund policy for Revalidate.ai email verification credits.',
+  alternates: { canonical: '/refund' },
+}
+
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-[#0B1120] font-sans antialiased text-zinc-400 flex flex-col justify-between">

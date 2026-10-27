@@ -2,6 +2,12 @@ import Link from 'next/link'
 import { Shield, Lock, Eye, Trash2 } from 'lucide-react'
 import BackButton from '../../components/BackButton'
 
+export const metadata = {
+  title: 'Privacy Policy | Revalidate.ai',
+  description: 'How Revalidate.ai collects, uses and protects your data when you verify email addresses and clean email lists.',
+  alternates: { canonical: '/privacy' },
+}
+
 export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-[#0B1120] font-sans antialiased text-zinc-400 flex flex-col justify-between">

@@ -3,8 +3,10 @@ import { MailCheck, Layers, Filter, BarChart3, Check, ArrowRight, Sparkles } fro
 import BackButton from '../../components/BackButton'
 
 export const metadata = {
-  title: 'How It Works | Revalidate.ai',
-  description: 'See exactly how Revalidate.ai cleans your email lists, protects your sender reputation, and boosts your email marketing ROI.',
+  title: 'How to Clean an Email List in 3 Steps | Revalidate.ai',
+  description: 'Upload a CSV or check one address. Revalidate.ai verifies syntax, MX records and live SMTP, then gives you a validation report and a clean email list.',
+  keywords: ['how to clean an email list', 'clean email list online', 'email list verification', 'bulk email validation CSV', 'remove invalid emails from list', 'reduce email bounce rate'],
+  alternates: { canonical: '/how-it-works' },
 }
 
 export default function HowItWorksPage() {

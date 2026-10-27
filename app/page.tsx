@@ -2,6 +2,10 @@ import Link from 'next/link'
 import { UploadCloud, ShieldAlert, BarChart3, Check, MailCheck, Layers, Code, Zap, CheckCircle2, Filter } from 'lucide-react'
 import CheckoutButton from '../components/CheckoutButton'
 
+export const metadata = {
+  alternates: { canonical: '/' },
+}
+
 export default function LandingPage({
   searchParams,
 }: {

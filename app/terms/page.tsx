@@ -2,6 +2,12 @@ import Link from 'next/link'
 import { FileText, ShieldCheck, CheckCircle2, AlertTriangle } from 'lucide-react'
 import BackButton from '../../components/BackButton'
 
+export const metadata = {
+  title: 'Terms of Service | Revalidate.ai',
+  description: 'The terms that apply when you use Revalidate.ai for email verification and email list cleaning.',
+  alternates: { canonical: '/terms' },
+}
+
 export default function TermsOfServicePage() {
   return (
     <div className="min-h-screen bg-[#0B1120] font-sans antialiased text-zinc-400 flex flex-col justify-between">

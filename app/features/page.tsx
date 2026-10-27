@@ -3,8 +3,10 @@ import { MailCheck, Layers, Code, Cpu, CheckCircle2 } from 'lucide-react'
 import BackButton from '../../components/BackButton'
 
 export const metadata = {
-  title: 'Features | Revalidate.ai',
-  description: 'Explore the powerful tools and features Revalidate.ai uses to clean your email lists and protect your sender reputation.',
+  title: 'SMTP & Catch-All Email Verification Features | Revalidate.ai',
+  description: 'Single and bulk email verification with syntax, MX record and live SMTP checks, plus disposable, role-based and catch-all email detection to clean your list.',
+  keywords: ['email verification features', 'SMTP email verification', 'catch-all email detection', 'disposable email detector', 'role-based email detection', 'MX record checker', 'bulk email verifier'],
+  alternates: { canonical: '/features' },
 }
 
 export default function FeaturesPage() {
