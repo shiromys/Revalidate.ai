@@ -4,18 +4,24 @@ import * as React from 'react'
 import { signUp } from '../actions'
 import Link from 'next/link'
 import { Eye, EyeOff, ArrowLeft, Check, Mail } from 'lucide-react'
+import Turnstile from '../../../components/Turnstile'
 
-export default function SignupPage({ 
-  searchParams 
-}: { 
-  searchParams?: { error?: string } 
+export default function SignupPage({
+  searchParams
+}: {
+  searchParams?: { error?: string }
 }) {
   const [isPending, startTransition] = React.useTransition();
   const [showPassword, setShowPassword] = React.useState(false);
-  
+
   // State to control the success modal and local errors
   const [showSuccessModal, setShowSuccessModal] = React.useState(false);
   const [localError, setLocalError] = React.useState(searchParams?.error || "");
+
+  // Cloudflare Turnstile token + a key to force the widget to re-render/reset
+  // after a failed attempt (tokens are single-use)
+  const [turnstileToken, setTurnstileToken] = React.useState("");
+  const [turnstileKey, setTurnstileKey] = React.useState(0);
 
   const handleSignUp = (formData: FormData) => {
     setLocalError(""); // Clear any previous errors
@@ -23,17 +29,21 @@ export default function SignupPage({
     startTransition(async () => {
       try {
         const result = await signUp(formData);
-        
+
         if (result?.success) {
           // Show the success modal!
           setShowSuccessModal(true);
         } else if (result?.error) {
           // Show the error returned from the server without redirecting
           setLocalError(result.error);
+          setTurnstileToken("");
+          setTurnstileKey((k) => k + 1);
         }
       } catch (err: unknown) {
         console.error("Signup failed:", err);
         setLocalError("An unexpected error occurred. Please try again.");
+        setTurnstileToken("");
+        setTurnstileKey((k) => k + 1);
       }
     });
   };
@@ -150,9 +160,22 @@ export default function SignupPage({
                 Verify your email using the link sent to your inbox. Login is enabled <span className="text-red-700">only after verification</span>.
               </p>
 
-              <button 
-                type="submit" 
-                disabled={isPending} 
+              {/* Hidden field carries the verified Turnstile token into the
+                  server action's FormData */}
+              <input type="hidden" name="turnstileToken" value={turnstileToken} />
+
+              <div className="flex justify-center">
+                <Turnstile
+                  key={turnstileKey}
+                  onVerify={(token) => setTurnstileToken(token)}
+                  onExpire={() => setTurnstileToken('')}
+                  onError={() => setTurnstileToken('')}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isPending || !turnstileToken}
                 className="w-full py-4 bg-[#b91c1c] text-white rounded-2xl font-black text-base hover:bg-[#991b1b] transition-all shadow-lg shadow-red-700/20 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 disabled:cursor-not-allowed"
               >
                 {isPending ? 'Verifying...' : 'Sign Up'}

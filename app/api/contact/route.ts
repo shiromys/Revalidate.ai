@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { verifyTurnstileToken } from '@/lib/turnstile'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
@@ -13,6 +14,18 @@ const contactSchema = z.object({
 export async function POST(request: Request) {
   try {
     const body = await request.json()
+
+    // 0. Cloudflare Turnstile bot/spam check — must pass before anything else runs
+    const isHuman = await verifyTurnstileToken(
+      body.turnstileToken,
+      request.headers.get('x-forwarded-for') ?? undefined
+    )
+    if (!isHuman) {
+      return NextResponse.json(
+        { success: false, error: "Verification failed. Please try again." },
+        { status: 400 }
+      )
+    }
 
     // Safely parse and sanitize the data
     const validatedData = contactSchema.safeParse(body)

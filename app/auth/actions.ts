@@ -3,8 +3,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
 import { z } from 'zod'
 import { logUserActivity } from '@/lib/supabase/admin'
+import { verifyTurnstileToken } from '@/lib/turnstile'
 
 /**
  * ZOD SCHEMAS FOR STRICT INPUT SANITIZATION
@@ -46,6 +48,14 @@ const BANNED_DOMAINS_SET = new Set([
  * Workflow: Sanitize -> Fast Domain Check -> Register -> Check Identity
  */
 export async function signUp(formData: FormData) {
+  // 0. Cloudflare Turnstile bot/spam check — must pass before anything else runs
+  const turnstileToken = formData.get('turnstileToken') as string | null;
+  const remoteIp = headers().get('x-forwarded-for') ?? undefined;
+  const isHuman = await verifyTurnstileToken(turnstileToken, remoteIp);
+  if (!isHuman) {
+    return { success: false, error: "Verification failed. Please complete the challenge and try again." };
+  }
+
   // 1. Zod Sanitization & Format Validation
   const parsedEmail = emailSchema.safeParse(formData.get('email') as string);
   const parsedPassword = passwordSchema.safeParse(formData.get('password') as string);

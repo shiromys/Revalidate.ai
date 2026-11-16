@@ -4,25 +4,35 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { Mail, Phone, Clock, CheckCircle } from 'lucide-react'
 import BackButton from '../../components/BackButton'
+import Turnstile from '../../components/Turnstile'
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState('')
+  const [turnstileKey, setTurnstileKey] = useState(0)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    if (!turnstileToken) {
+      setErrorMessage('Please complete the verification challenge before sending.')
+      return
+    }
+
     setIsSubmitting(true)
     setErrorMessage('')
 
     const form = e.currentTarget;
     const formData = new FormData(form)
-    
+
     const payload = {
       name: formData.get('name'),
       email: formData.get('email'),
       subject: formData.get('subject'),
       message: formData.get('message'),
+      turnstileToken,
     }
 
     try {
@@ -42,10 +52,12 @@ export default function ContactPage() {
       } else {
         setErrorMessage(result.error || 'Something went wrong. Please try again.')
       }
-    } catch { 
+    } catch {
       setErrorMessage('Network error. Failed to reach the server. Please try again.')
     } finally {
       setIsSubmitting(false)
+      setTurnstileToken('')
+      setTurnstileKey((k) => k + 1)
     }
   }
 
@@ -168,9 +180,18 @@ export default function ContactPage() {
                     />
                   </div>
 
-                  <button 
-                    type="submit" 
-                    disabled={isSubmitting}
+                  <div className="pt-2 flex justify-center">
+                    <Turnstile
+                      key={turnstileKey}
+                      onVerify={(token) => setTurnstileToken(token)}
+                      onExpire={() => setTurnstileToken('')}
+                      onError={() => setTurnstileToken('')}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting || !turnstileToken}
                     className="w-full bg-[#8B0000] hover:bg-[#6A0000] text-white font-bold py-4 rounded-xl transition-all shadow-xl shadow-[#8B0000]/20 disabled:opacity-50 active:scale-[0.98]"
                   >
                     {isSubmitting ? 'Sending Message...' : 'Send Message'}
