@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { sendNexusWebhook } from '@/lib/nexus/webhooks'
 
 // --- ZOD SCHEMAS FOR INPUT SANITIZATION ---
 const emailSchema = z.string().email("Invalid email format").trim().toLowerCase()
@@ -57,7 +58,12 @@ export async function deleteUserAccount(userId: string) {
       return { success: false, error: "Failed to delete authentication record due to a system error." }
     }
 
-    // 5. Refresh the admin page to show the updated list
+    // 5. Tell the Nexus this user is gone so it purges any cached data for
+    // them (GDPR/CCPA — spec section 7: "Apps must tell the Nexus about
+    // user deletions ... through a user.deleted webhook.")
+    void sendNexusWebhook('user.deleted', parsedId.data)
+
+    // 6. Refresh the admin page to show the updated list
     revalidatePath('/admin')
     revalidatePath('/admin/users')
     return { success: true }

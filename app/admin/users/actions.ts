@@ -2,6 +2,7 @@
 
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { revalidatePath } from 'next/cache';
+import { sendNexusWebhook } from '@/lib/nexus/webhooks';
 
 export async function deleteAndBanUser(formData: FormData) {
     const userId = formData.get('userId') as string;
@@ -24,7 +25,10 @@ export async function deleteAndBanUser(formData: FormData) {
         // 3. Add their email to the banned list so they can never sign up again
         await adminSupabase.from('banned_emails').insert([{ email }]);
 
-        // 4. Tell Next.js to instantly refresh the table UI
+        // 4. Tell the Nexus this user is gone (GDPR/CCPA — see lib/nexus/webhooks.ts)
+        void sendNexusWebhook('user.deleted', userId);
+
+        // 5. Tell Next.js to instantly refresh the table UI
         revalidatePath('/admin/users');
         
     } catch (error) {

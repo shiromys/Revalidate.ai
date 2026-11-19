@@ -36,7 +36,8 @@ export default function AdminSidebar({ email }: { email: string }) {
         { name: 'User Management', href: '/admin/users' },
         { name: 'Top Up Credits', href: '/admin/topup' },
         { name: 'Support Tickets', href: '/admin/tickets', badge: unreadTickets },
-        { name: 'System Health', href: '/admin/health' }, 
+        { name: 'Nexus API Keys', href: '/admin/api-keys' },
+        { name: 'System Health', href: '/admin/health' },
     ];
 
     return (

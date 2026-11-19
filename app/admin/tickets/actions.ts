@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { Resend } from 'resend'
+import { sendNexusWebhook } from '@/lib/nexus/webhooks'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -37,6 +38,10 @@ export async function closeTicket(ticketId: string) {
 
     if (error) throw error
 
+    // Keep the Nexus in sync even when a ticket is closed from this app's
+    // own admin UI, not just via the Support API (spec section 5: ticket.updated).
+    void sendNexusWebhook('ticket.updated', ticketId)
+
     revalidatePath('/admin/tickets')
     return { success: true }
   } catch (error) {
@@ -53,6 +58,9 @@ export async function replyToTicket(ticketId: string, userEmail: string, subject
     const isAdmin = await verifyAdmin()
     if (!isAdmin) throw new Error("Unauthorized access")
 
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
     // 1. Send the email using Resend
     // Here we strictly enforce info@revalidate.ai for sending AND receiving
     const { error: emailError } = await resend.emails.send({
@@ -65,7 +73,18 @@ export async function replyToTicket(ticketId: string, userEmail: string, subject
 
     if (emailError) throw new Error(emailError.message)
 
-    // 2. Mark the ticket as closed in the database
+    // 2. Record the reply in the thread so it shows up for the Nexus too
+    // (GET /tickets/{id} reads from support_messages, not just the ticket row).
+    await supabaseAdmin.from('support_messages').insert([
+      {
+        ticket_id: ticketId,
+        type: 'reply',
+        author: user?.email || 'admin',
+        body_text: replyMessage,
+      },
+    ]).then(() => {}, (err) => console.error('🚨 Failed to record reply message:', err))
+
+    // 3. Mark the ticket as closed in the database
     const { error: dbError } = await supabaseAdmin
       .from('support_tickets')
       .update({ status: 'closed' })
@@ -73,7 +92,11 @@ export async function replyToTicket(ticketId: string, userEmail: string, subject
 
     if (dbError) throw dbError
 
-    // 3. Refresh the UI
+    // 4. Notify the Nexus (spec section 5: message.created + ticket.updated).
+    void sendNexusWebhook('message.created', ticketId)
+    void sendNexusWebhook('ticket.updated', ticketId)
+
+    // 5. Refresh the UI
     revalidatePath('/admin/tickets')
     return { success: true }
   } catch (error) {
